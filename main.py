@@ -5,40 +5,14 @@ import json
 from requests.auth import HTTPBasicAuth
 client = discord.Client()
 
-def get_rank(player_name="TheSam"):
-    url = """https://aoe2.net/api/leaderboard?game=aoe2de&leaderboard_id=3&search={player_name}""".format(
-        player_name=player_name)
-    response = requests.get(url)
-    json_data = json.loads(response.text)
-    json_data = json_data['leaderboard'][0]
-    json_data['rating'] = int(
-        (json_data['previous_rating'] + json_data['highest_rating']) / 2)
-    return (json_data)
-
-
-def set_register(name, username='', tournament_name=''):
-    url = "https://api.challonge.com/v1/tournaments/{}/participants.json".format(tournament_name)
-    payload = {"participant": {"name": name, "misc": username}}
-    response = requests.post(url,
-                             json=payload,
-                             auth=HTTPBasicAuth(
-                                 os.getenv('USERNAME'),
-                                 os.getenv('APIKEY')))
-
-    json_data = json.loads(response.text)
-    return (json_data)
-
-
 def get_participants(tournament_name):
     url = "https://api.challonge.com/v1/tournaments/{}/participants.json".format(tournament_name)
-    
     response = requests.get(url,
                             auth=HTTPBasicAuth(
                                 os.getenv('USERNAME'),
                                 os.getenv('APIKEY')))
     json_data = json.loads(response.text)
     return (json_data)
-
 
 def get_matches(tournament_name):
     url = "https://api.challonge.com/v1/tournaments/{}/matches.json".format(tournament_name)
@@ -80,31 +54,8 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    # if message.content.startswith('!hello'):
-    #     username = '{}#{}'.format(message.author.name,
-    #                               message.author.discriminator)
-    #     embedVar = print_message("Hello", "Hello", 0x00ff00, [dict(name="hello", value=username), dict(name="hello2", value="Baneados todos")])
-    #     await message.channel.send(embed=embedVar)
-        #await message.reply('Hello! {}'.format(username))
-
-    # if message.content.startswith('!register'):
-    #     #TODO register with mentions
-    #     username = '{}#{}'.format(message.author.name,
-    #                               message.author.discriminator)
-
-    #     tournament_name = message.channel.name.split("-")
-    #     if(len(tournament_name)!=2):
-    #       await message.channel.send("canal equivocado")
-    #     tournament_name = tournament_name[1]
-
-    #     set_register(message.author.name, username, tournament_name)
-    #     await message.channel.send('Success {}'.format(username))
-
     if message.content.startswith('!pavel'):
         await message.channel.send(':clown: :eggplant:')
-
-
-
 
     if message.content.startswith('!result'):
         username = '{}#{}'.format(message.author.name,
@@ -150,7 +101,6 @@ async def on_message(message):
                     ids_paticipants.append(participant['participant']['id'])
             iter = iter + 1
 
-
         matches = get_matches(tournament_name)
         
         found_match = False
@@ -174,7 +124,6 @@ async def on_message(message):
                         'player2_id'] else unique_ids[1]['score']
                 found_match = True
                 update_match(match['match']['id'], match, tournament_name)
-                
 
         if(not found_match):
           embedVar = print_message("No se encontró una partida asociada.", "Revisa que te encuentes en el canal de tu categoría", 0xff0000)
